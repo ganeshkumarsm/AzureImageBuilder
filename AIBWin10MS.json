@@ -103,8 +103,7 @@
                         "baseosimg": "windows-10"
                     },
                     "replicationRegions": [
-                      
-                      
+                      "westus"
                     ]
                 }
             ]
