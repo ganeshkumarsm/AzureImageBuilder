@@ -122,7 +122,7 @@ New-AzGalleryImageDefinition `
    $templateFilePath = "armTemplateWinSIG.json"
 
 Invoke-WebRequest `
-   -Uri "https://raw.githubusercontent.com/TomHickling/AzureImageBuilder/master/AIBWin10MS.json" `
+   -Uri "https://raw.githubusercontent.com/ganeshkumarsm/AzureImageBuilder/master/AIBWin10MS.json" `
    -OutFile $templateFilePath `
    -UseBasicParsing
 
