@@ -4,6 +4,26 @@
 #Create temp folder
 New-Item -Path 'C:\temp' -ItemType Directory -Force | Out-Null
 
+#Create Deprovisioner script for sysprep
+New-Item -Path 'c:\DeprovisioningScript.ps1' -ItemType File -Force | Out-Null
+add-content 'c:\DeprovisioningScript.ps1' "Write-Output '>>> Waiting for GA Service (RdAgent) to start ...'"
+add-content 'c:\DeprovisioningScript.ps1' "while ((Get-Service RdAgent).Status -ne 'Running') { Start-Sleep -s 5 }"
+add-content 'c:\DeprovisioningScript.ps1' "Write-Output '>>> Waiting for GA Service (WindowsAzureTelemetryService) to start ...'"
+add-content 'c:\DeprovisioningScript.ps1' "while ((Get-Service WindowsAzureTelemetryService) -and ((Get-Service WindowsAzureTelemetryService).Status -ne 'Running')) { Start-Sleep -s 5 }"
+add-content 'c:\DeprovisioningScript.ps1' "Write-Output '>>> Waiting for GA Service (WindowsAzureGuestAgent) to start ...'"
+add-content 'c:\DeprovisioningScript.ps1' "while ((Get-Service WindowsAzureGuestAgent).Status -ne 'Running') { Start-Sleep -s 5 }"
+add-content 'c:\DeprovisioningScript.ps1' "Write-Output '>>> Sysprepping VM ...'"
+add-content 'c:\DeprovisioningScript.ps1' "if( Test-Path $Env:SystemRoot\system32\Sysprep\unattend.xml ) {"
+add-content 'c:\DeprovisioningScript.ps1' "Remove-Item $Env:SystemRoot\system32\Sysprep\unattend.xml -Force"
+add-content 'c:\DeprovisioningScript.ps1' "}"
+add-content 'c:\DeprovisioningScript.ps1' "& $Env:SystemRoot\System32\Sysprep\Sysprep.exe /oobe /generalize /quiet /quit"
+add-content 'c:\DeprovisioningScript.ps1' "while($true) {"
+add-content 'c:\DeprovisioningScript.ps1' "$imageState = (Get-ItemProperty HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Setup\State).ImageState"
+add-content 'c:\DeprovisioningScript.ps1' "Write-Output $imageState"
+add-content 'c:\DeprovisioningScript.ps1' "if ($imageState -eq 'IMAGE_STATE_GENERALIZE_RESEAL_TO_OOBE') { break }"
+add-content 'c:\DeprovisioningScript.ps1' "Start-Sleep -s 5"
+add-content 'c:\DeprovisioningScript.ps1' "}"
+add-content 'c:\DeprovisioningScript.ps1' "Write-Output '>>> Sysprep complete ...'"
 
 #Install VSCode
 Invoke-WebRequest -Uri 'https://go.microsoft.com/fwlink/?Linkid=852157' -OutFile 'c:\temp\VScode.exe'
